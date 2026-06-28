@@ -248,6 +248,7 @@ export function AddSubscriptionScreen() {
         </Field>
 
         <Field
+          bare
           footer={
             <View style={styles.chips}>
               {QUICK_DATES.map((label) => {
@@ -365,15 +366,17 @@ function Field({
   label,
   children,
   footer,
+  bare = false,
 }: {
   label: string;
   children: React.ReactNode;
   footer?: React.ReactNode;
+  bare?: boolean;
 }) {
   return (
     <View style={styles.field}>
       <Text style={styles.sectionTitle}>{label}</Text>
-      <View style={styles.inputCard}>{children}</View>
+      {bare ? children : <View style={styles.inputCard}>{children}</View>}
       {footer}
     </View>
   );
@@ -522,10 +525,10 @@ const styles = StyleSheet.create((theme) => ({
     color: theme.colors.primaryForeground,
   },
   dateField: {
-    backgroundColor: theme.colors.surface,
-    borderRadius: 12,
-    paddingHorizontal: 12,
-    paddingVertical: 12,
+    backgroundColor: theme.colors.card,
+    borderRadius: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
     flexDirection: "row",
     alignItems: "center",
     gap: 10,
