@@ -187,7 +187,7 @@ const styles = StyleSheet.create((theme) => ({
     paddingBottom: 20,
   },
   heroCard: {
-    backgroundColor: theme.name === "dark" ? "#15275F" : theme.colors.hero,
+    backgroundColor: theme.colors.hero,
     borderRadius: 16,
     padding: 20,
     overflow: "hidden",
@@ -221,7 +221,7 @@ const styles = StyleSheet.create((theme) => ({
   heroAmount: {
     fontSize: 38,
     fontWeight: "700",
-    color: "#FFFFFF",
+    color: theme.colors.primaryForeground,
     lineHeight: 40,
     marginTop: 4,
     fontVariant: ["tabular-nums"],

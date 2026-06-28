@@ -74,12 +74,12 @@ const styles = StyleSheet.create((theme) => ({
     borderRadius: 22,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: theme.name === "dark" ? "#1E2A5F" : "#EEF2FF",
+    backgroundColor: theme.colors.avatarTintBg,
   },
   avatarText: {
     fontSize: 13,
     fontWeight: "700",
-    color: theme.name === "dark" ? "#C7D2FE" : "#253A8A",
+    color: theme.colors.avatarTintText,
   },
   rowMain: {
     flex: 1,

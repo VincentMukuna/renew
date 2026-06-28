@@ -203,7 +203,7 @@ const styles = StyleSheet.create((theme) => ({
     borderRadius: 999,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: theme.name === "dark" ? "#1E2A5F" : "#EEF2FF",
+    backgroundColor: theme.colors.avatarTintBg,
   },
   previewAvatarText: {
     fontSize: 20,
