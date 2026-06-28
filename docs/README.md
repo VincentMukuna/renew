@@ -7,6 +7,7 @@ Use these docs in this order:
 | Document | Role |
 | --- | --- |
 | [prd.md](./prd.md) | Product requirements and MVP scope |
+| [payment-methods-prd.md](./payment-methods-prd.md) | Future payment method labels feature (post-MVP) |
 | [design-brief.md](./design-brief.md) | Visual direction and screen behavior |
 | [architecture.md](./architecture.md) | Technical posture inherited from Owed |
 | [implementation-plan.md](./implementation-plan.md) | Step-by-step MVP slices for future agents |

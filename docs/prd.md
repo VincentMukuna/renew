@@ -93,3 +93,9 @@ Default categories:
 - Other
 
 Categories are domain data in SQLite, not plain strings or AsyncStorage preferences.
+
+## Future Features (Post-MVP)
+
+Documented separately — not in MVP scope:
+
+- [Payment Methods](./payment-methods-prd.md) — optional labels for how each subscription is paid (no sensitive card or account data).
