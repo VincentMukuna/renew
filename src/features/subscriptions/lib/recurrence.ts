@@ -140,6 +140,11 @@ export function getCompletedBillingCycles(
   return Math.max(0, count - 1);
 }
 
+export function isDueToday(nextRenewalDate: Date, now: Date): boolean {
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  return nextRenewalDate.getTime() === today.getTime();
+}
+
 export function isDueSoon(nextRenewalDate: Date, now: Date, dueSoonDays: number): boolean {
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   const dueSoonUntil = new Date(today);

@@ -12,6 +12,7 @@ import {
   getNextRenewalDate,
   getYearlyEquivalent,
   isDueSoon,
+  isDueToday,
   recurrenceLabels,
 } from "./recurrence";
 import { formatCurrency, getInitials } from "@/lib/utils/formatters";
@@ -38,6 +39,7 @@ export function toSubscriptionListItemView(
     renewalLabel: formatRenewalDate(nextRenewalDate),
     nextRenewalDate,
     isActive: subscription.isActive,
+    isDueToday: subscription.isActive && isDueToday(nextRenewal, now),
     isDueSoon:
       subscription.isActive && isDueSoon(nextRenewal, now, APP_CONFIG.dueSoonDays),
   };

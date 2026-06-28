@@ -42,6 +42,7 @@ export type SubscriptionListItemView = {
   renewalLabel: string;
   nextRenewalDate: string;
   isActive: boolean;
+  isDueToday: boolean;
   isDueSoon: boolean;
 };
 

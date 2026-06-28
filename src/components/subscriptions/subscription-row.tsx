@@ -37,7 +37,11 @@ function SubscriptionRowComponent({
           <Text numberOfLines={1} style={styles.rowTitle}>
             {subscription.name}
           </Text>
-          {!subscription.isActive ? <Text style={styles.badge}>Inactive</Text> : null}
+          {!subscription.isActive ? (
+            <Text style={[styles.badge, styles.badgeInactive]}>Inactive</Text>
+          ) : subscription.isDueToday ? (
+            <Text style={[styles.badge, styles.badgeDueToday]}>Due today</Text>
+          ) : null}
         </View>
         <Text numberOfLines={1} style={styles.rowSubtitle}>
           {subtitle}
@@ -96,13 +100,19 @@ const styles = StyleSheet.create((theme) => ({
   badge: {
     overflow: "hidden",
     borderRadius: 999,
-    backgroundColor: theme.colors.status.inactive.bg,
     paddingHorizontal: 6,
     paddingVertical: 2,
     fontSize: 10,
     fontWeight: "700",
-    color: theme.colors.status.inactive.text,
     textTransform: "uppercase",
+  },
+  badgeInactive: {
+    backgroundColor: theme.colors.status.inactive.bg,
+    color: theme.colors.status.inactive.text,
+  },
+  badgeDueToday: {
+    backgroundColor: theme.colors.status.dueSoon.bg,
+    color: theme.colors.status.dueSoon.text,
   },
   rowSubtitle: {
     fontSize: 12,
