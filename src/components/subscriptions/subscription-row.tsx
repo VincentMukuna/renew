@@ -10,10 +10,20 @@ import type { SubscriptionListItemView } from "@/features/subscriptions/view-mod
 type SubscriptionRowProps = {
   subscription: SubscriptionListItemView;
   onPress?: (id: string) => void;
+  showCategoryMeta?: boolean;
   style?: ViewStyle | null;
 };
 
-function SubscriptionRowComponent({ subscription, onPress, style }: SubscriptionRowProps) {
+function SubscriptionRowComponent({
+  subscription,
+  onPress,
+  showCategoryMeta = true,
+  style,
+}: SubscriptionRowProps) {
+  const subtitle = showCategoryMeta
+    ? `${subscription.planName} · ${subscription.categoryEmoji} ${subscription.categoryName}`
+    : subscription.planName;
+
   return (
     <PressableScale
       onPress={() => onPress?.(subscription.id)}
@@ -30,7 +40,7 @@ function SubscriptionRowComponent({ subscription, onPress, style }: Subscription
           {!subscription.isActive ? <Text style={styles.badge}>Inactive</Text> : null}
         </View>
         <Text numberOfLines={1} style={styles.rowSubtitle}>
-          {subscription.planName} · {subscription.categoryEmoji} {subscription.categoryName}
+          {subtitle}
         </Text>
       </View>
       <View style={styles.rowMeta}>

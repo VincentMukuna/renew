@@ -1,4 +1,4 @@
-import type { Recurrence } from "@/types";
+import type { Category, Recurrence } from "@/types";
 
 export type CreateSubscriptionInput = {
   name: string;
@@ -11,6 +11,10 @@ export type CreateSubscriptionInput = {
 };
 
 export type UpdateSubscriptionInput = Partial<CreateSubscriptionInput>;
+
+export type CategoryDetailView = Category & {
+  subscriptionCount: number;
+};
 
 export type SubscriptionSummary = {
   id: string;

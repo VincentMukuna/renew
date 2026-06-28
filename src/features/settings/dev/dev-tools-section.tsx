@@ -4,6 +4,7 @@ import { ChevronRight } from "lucide-react-native";
 import { StyleSheet } from "react-native-unistyles";
 
 import { PressableScale } from "@/components/shared/pressable-scale";
+import { resetOnboardingState } from "@/features/onboarding/lib/onboarding-storage";
 import { selectionChange } from "@/lib/haptics";
 
 import { useResetDatabase } from "../hooks/use-reset-database";
@@ -53,6 +54,24 @@ export function DevToolsSection() {
   const seedSubscriptions = useSeedSubscriptions();
   const resetDatabase = useResetDatabase();
 
+  const confirmOnboardingReset = () => {
+    selectionChange();
+    Alert.alert(
+      "Reset onboarding?",
+      "Shows the onboarding flow again the next time the app checks onboarding state.",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Reset",
+          style: "destructive",
+          onPress: () => {
+            void resetOnboardingState();
+          },
+        },
+      ],
+    );
+  };
+
   const confirmReset = () => {
     selectionChange();
     Alert.alert(
@@ -91,6 +110,14 @@ export function DevToolsSection() {
           onPress={confirmReset}
           title="Reset records"
           value={resetDatabase.isPending ? "Resetting" : "Reset"}
+        />
+        <DevToolRow
+          bordered
+          description="Clear the completed flag so onboarding can run again."
+          icon="👋"
+          onPress={confirmOnboardingReset}
+          title="Reset onboarding"
+          value="Reset"
         />
       </View>
     </View>

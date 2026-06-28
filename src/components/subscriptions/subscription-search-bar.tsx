@@ -8,6 +8,7 @@ import { StyleSheet, useUnistyles } from "react-native-unistyles";
 type SubscriptionSearchBarProps = {
   value: string;
   onChangeText: (text: string) => void;
+  placeholder?: string;
   variant?: "default" | "header";
 };
 
@@ -18,7 +19,7 @@ export type SubscriptionSearchBarRef = {
 const SubscriptionSearchBarInner = forwardRef<
   SubscriptionSearchBarRef,
   SubscriptionSearchBarProps
->(({ value, onChangeText, variant = "default" }, ref) => {
+>(({ value, onChangeText, placeholder = "Search by name or plan", variant = "default" }, ref) => {
   const inputRef = useRef<TextInputType>(null);
   const { theme } = useUnistyles();
 
@@ -41,7 +42,7 @@ const SubscriptionSearchBarInner = forwardRef<
         autoCorrect={false}
         clearButtonMode="never"
         onChangeText={onChangeText}
-        placeholder="Search by name or plan"
+        placeholder={placeholder}
         placeholderTextColor={theme.colors.mutedLight}
         returnKeyType="search"
         style={styles.input}

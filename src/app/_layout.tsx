@@ -77,6 +77,16 @@ export default function RootLayout() {
               }}
             />
             <Stack.Screen
+              name="add-category"
+              options={{
+                ...modalOptions,
+                presentation: "modal",
+                animation: "slide_from_bottom",
+                headerShown: true,
+                title: "Add category",
+              }}
+            />
+            <Stack.Screen
               name="subscription/[id]"
               options={{
                 ...stackOptions,
@@ -94,6 +104,16 @@ export default function RootLayout() {
                 headerLargeTitleEnabled: false,
                 animation: "slide_from_right",
                 title: "Categories",
+              }}
+            />
+            <Stack.Screen
+              name="category/[id]"
+              options={{
+                ...stackOptions,
+                headerShown: true,
+                headerLargeTitleEnabled: false,
+                animation: "slide_from_right",
+                title: "Category",
               }}
             />
           </Stack>

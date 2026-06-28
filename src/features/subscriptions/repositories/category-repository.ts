@@ -1,6 +1,7 @@
 import { getDb } from "@/lib/db/client";
 import type { CategoriesRow } from "@/lib/db/row-types";
 import { createId } from "@/lib/id";
+import type { CategoryDetailView } from "@/features/subscriptions/view-models";
 import type { Category } from "@/types";
 
 function toCategory(row: CategoriesRow): Category {
@@ -25,6 +26,31 @@ export const categoryRepository = {
     );
 
     return rows.map(toCategory);
+  },
+
+  async getById(id: string): Promise<CategoryDetailView | undefined> {
+    const db = await getDb();
+    const row = await db.getFirstAsync<CategoriesRow>(
+      `SELECT * FROM categories
+       WHERE id = ? AND archived_at IS NULL`,
+      [id],
+    );
+
+    if (!row) {
+      return undefined;
+    }
+
+    const usage = await db.getFirstAsync<{ count: number }>(
+      `SELECT COUNT(*) AS count
+       FROM subscriptions
+       WHERE category_id = ? AND archived_at IS NULL`,
+      [id],
+    );
+
+    return {
+      ...toCategory(row),
+      subscriptionCount: usage?.count ?? 0,
+    };
   },
 
   async create(input: { name: string; emoji: string }): Promise<Category> {

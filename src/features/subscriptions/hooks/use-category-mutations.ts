@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
+import { categoryKeys } from "@/features/subscriptions/hooks/query-keys";
 import { categoryRepository } from "@/features/subscriptions/repositories/category-repository";
 import { useUiStore } from "@/features/subscriptions/store/ui-store";
 import { invalidateCategoryQueries } from "@/lib/query/invalidate-queries";
@@ -10,8 +11,9 @@ export function useCreateCategory() {
 
   return useMutation({
     mutationFn: (input: { name: string; emoji: string }) => categoryRepository.create(input),
-    onSuccess: async () => {
+    onSuccess: async (category) => {
       await invalidateCategoryQueries(queryClient);
+      await queryClient.invalidateQueries({ queryKey: categoryKeys.detail(category.id) });
       showToast("Category saved.");
     },
     onError: (error) => {
@@ -30,8 +32,9 @@ export function useRenameCategory() {
   return useMutation({
     mutationFn: ({ id, name, emoji }: { id: string; name: string; emoji: string }) =>
       categoryRepository.update(id, { name, emoji }),
-    onSuccess: async () => {
+    onSuccess: async (category) => {
       await invalidateCategoryQueries(queryClient);
+      await queryClient.invalidateQueries({ queryKey: categoryKeys.detail(category.id) });
       showToast("Category updated.");
     },
     onError: (error) => {

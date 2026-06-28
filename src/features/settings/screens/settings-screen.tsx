@@ -105,7 +105,6 @@ export function SettingsScreen() {
               <Text style={styles.icon}>🏷️</Text>
               <Text style={styles.label}>Manage categories</Text>
               <View style={styles.valueWrap}>
-                <Text style={styles.value}>Soon</Text>
                 <ChevronRight color={theme.colors.iconMuted} size={16} strokeWidth={2} />
               </View>
             </PressableScale>

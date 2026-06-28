@@ -60,7 +60,10 @@ function exitAddSubscription() {
 export function AddSubscriptionScreen() {
   const { theme } = useUnistyles();
   const navigation = useNavigation();
-  const { from } = useLocalSearchParams<{ from?: string }>();
+  const { categoryId: presetCategoryId, from } = useLocalSearchParams<{
+    categoryId?: string;
+    from?: string;
+  }>();
   const fromOnboarding = from === "onboarding";
   const addSubscription = useAddSubscription();
   const { data: categories = [] } = useCategories();
@@ -80,7 +83,10 @@ export function AddSubscriptionScreen() {
     formState: { isValid },
   } = useForm<AddSubscriptionFormValues>({
     resolver: zodResolver(addSubscriptionSchema),
-    defaultValues,
+    defaultValues: {
+      ...defaultValues,
+      categoryId: typeof presetCategoryId === "string" ? presetCategoryId : "",
+    },
     mode: "onChange",
   });
 

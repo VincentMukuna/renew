@@ -1,339 +1,298 @@
-import { useCallback, useState } from "react";
+import { useCallback, useDeferredValue, useMemo, useState } from "react";
 
-import { Alert, ScrollView, Text, TextInput, View } from "react-native";
+import { Text, View } from "react-native";
 
-import { Stack } from "expo-router";
+import { Stack, router } from "expo-router";
 
-import { Check, Pencil, Trash2, X } from "lucide-react-native";
+import { FlashList } from "@shopify/flash-list";
+import { Search, Tags } from "lucide-react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
+import { FAB_SCROLL_PADDING, FabButton } from "@/components/shared/fab-button";
 import { PressableScale } from "@/components/shared/pressable-scale";
-import {
-  useArchiveCategory,
-  useCreateCategory,
-  useRenameCategory,
-} from "@/features/subscriptions/hooks/use-category-mutations";
+import { SubscriptionSearchBar } from "@/components/subscriptions/subscription-search-bar";
 import { useCategories } from "@/features/subscriptions/hooks/use-categories";
-import { selectionChange } from "@/lib/haptics";
+import { useSubscriptionSummaries } from "@/features/subscriptions/hooks/use-subscriptions";
+import { toSubscriptionListItemView } from "@/features/subscriptions/lib/mappers";
+import { getMonthlyEquivalent } from "@/features/subscriptions/lib/recurrence";
+import type { SubscriptionSummary } from "@/features/subscriptions/view-models";
+import { formatCurrency } from "@/lib/utils/formatters";
+import type { Category } from "@/types";
 
-const DEFAULT_CATEGORY_EMOJI = "📦";
-
-function normalizeEmoji(value: string): string {
-  return value.trim() || DEFAULT_CATEGORY_EMOJI;
+function normalizeCategoryQuery(value: string): string {
+  return value.trim().toLowerCase();
 }
+
+type CategoryMetrics = {
+  activeCount: number;
+  dueSoonCount: number;
+  monthlyExpenses: number;
+};
 
 export function CategoriesScreen() {
   const { theme } = useUnistyles();
   const { data: categories = [] } = useCategories();
-  const createCategory = useCreateCategory();
-  const renameCategory = useRenameCategory();
-  const archiveCategory = useArchiveCategory();
-  const [emoji, setEmoji] = useState(DEFAULT_CATEGORY_EMOJI);
-  const [name, setName] = useState("");
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [editingEmoji, setEditingEmoji] = useState(DEFAULT_CATEGORY_EMOJI);
-  const [editingName, setEditingName] = useState("");
+  const { data: subscriptionSummaries = [] } = useSubscriptionSummaries();
+  const [searchQuery, setSearchQuery] = useState("");
+  const deferredSearchQuery = useDeferredValue(searchQuery);
 
-  const handleCreate = useCallback(() => {
-    const trimmed = name.trim();
-    if (!trimmed) return;
-    createCategory.mutate(
-      { emoji: normalizeEmoji(emoji), name: trimmed },
-      {
-        onSuccess: () => {
-          setEmoji(DEFAULT_CATEGORY_EMOJI);
-          setName("");
-        },
-      },
+  const categoryMetrics = useMemo(
+    () => buildCategoryMetrics(subscriptionSummaries),
+    [subscriptionSummaries],
+  );
+
+  const visibleCategories = useMemo(() => {
+    const query = normalizeCategoryQuery(deferredSearchQuery);
+
+    if (!query) {
+      return categories;
+    }
+
+    return categories.filter((category) =>
+      normalizeCategoryQuery(`${category.emoji} ${category.name}`).includes(query),
     );
-  }, [createCategory, emoji, name]);
+  }, [categories, deferredSearchQuery]);
 
-  const handleRename = useCallback(() => {
-    if (!editingId || !editingName.trim()) return;
-    renameCategory.mutate(
-      { id: editingId, emoji: normalizeEmoji(editingEmoji), name: editingName.trim() },
-      {
-        onSuccess: () => {
-          setEditingId(null);
-          setEditingEmoji(DEFAULT_CATEGORY_EMOJI);
-          setEditingName("");
-        },
-      },
-    );
-  }, [editingEmoji, editingId, editingName, renameCategory]);
-
-  const cancelEdit = useCallback(() => {
-    selectionChange();
-    setEditingId(null);
-    setEditingEmoji(DEFAULT_CATEGORY_EMOJI);
-    setEditingName("");
+  const openAdd = useCallback(() => {
+    router.push("/add-category");
   }, []);
 
-  const confirmArchive = useCallback(
-    (id: string, categoryName: string) => {
-      Alert.alert("Archive category?", `Archive ${categoryName} if it is unused.`, [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Archive",
-          style: "destructive",
-          onPress: () => archiveCategory.mutate(id),
-        },
-      ]);
-    },
-    [archiveCategory],
+  const openCategory = useCallback((id: string) => {
+    router.push(`/category/${id}`);
+  }, []);
+
+  const renderItem = useCallback(
+    ({ item }: { item: Category }) => (
+      <CategoryRow
+        category={item}
+        metrics={categoryMetrics.get(item.id)}
+        onPress={() => openCategory(item.id)}
+      />
+    ),
+    [categoryMetrics, openCategory],
+  );
+
+  const listHeader = useMemo(
+    () => (
+      <View style={styles.summary}>
+        <Text style={styles.summaryText}>
+          {categories.length} {categories.length === 1 ? "category" : "categories"}
+        </Text>
+      </View>
+    ),
+    [categories.length],
+  );
+
+  const emptyState = useMemo(
+    () => (
+      <View style={styles.empty}>
+        <View style={styles.emptyIcon}>
+          {searchQuery.trim() ? (
+            <Search color={theme.colors.mutedLight} size={20} strokeWidth={1.5} />
+          ) : (
+            <Tags color={theme.colors.mutedLight} size={20} strokeWidth={1.5} />
+          )}
+        </View>
+        <Text style={styles.emptyTitle}>{searchQuery.trim() ? "No matches" : "No categories"}</Text>
+        <Text style={styles.emptyCopy}>
+          {searchQuery.trim()
+            ? "Try another category name or emoji."
+            : "Add categories to organize subscriptions."}
+        </Text>
+        {!searchQuery.trim() ? (
+          <PressableScale onPress={openAdd} style={styles.emptyCta}>
+            <Text style={styles.emptyCtaText}>Add category</Text>
+          </PressableScale>
+        ) : null}
+      </View>
+    ),
+    [openAdd, searchQuery, theme.colors.mutedLight],
   );
 
   return (
-    <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+    <View style={styles.screen}>
       <Stack.Screen options={{ title: "Categories" }} />
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>New category</Text>
-        <View style={styles.createCard}>
-          <TextInput
-            autoCapitalize="none"
-            autoCorrect={false}
-            maxLength={4}
-            onChangeText={setEmoji}
-            placeholder={DEFAULT_CATEGORY_EMOJI}
-            placeholderTextColor={theme.colors.placeholder}
-            returnKeyType="next"
-            style={styles.emojiInput}
-            value={emoji}
-          />
-          <TextInput
-            autoCapitalize="words"
-            autoCorrect={false}
-            onChangeText={setName}
-            onSubmitEditing={handleCreate}
-            placeholder="Category name"
-            placeholderTextColor={theme.colors.placeholder}
-            returnKeyType="done"
-            style={styles.input}
-            value={name}
-          />
-          <PressableScale onPress={handleCreate} style={styles.action}>
-            <Text style={styles.actionText}>Add</Text>
-          </PressableScale>
-        </View>
+
+      <View style={styles.header}>
+        <SubscriptionSearchBar
+          onChangeText={setSearchQuery}
+          placeholder="Search categories"
+          value={searchQuery}
+          variant="header"
+        />
       </View>
 
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Categories</Text>
-        <View style={styles.listCard}>
-          {categories.map((category, index) => {
-            const editing = editingId === category.id;
-            return (
-              <View key={category.id} style={[styles.row, index > 0 && styles.rowBorder]}>
-                {editing ? (
-                  <>
-                    <TextInput
-                      autoCapitalize="none"
-                      autoCorrect={false}
-                      maxLength={4}
-                      onChangeText={setEditingEmoji}
-                      placeholder={DEFAULT_CATEGORY_EMOJI}
-                      placeholderTextColor={theme.colors.placeholder}
-                      returnKeyType="next"
-                      style={styles.editEmojiInput}
-                      value={editingEmoji}
-                    />
-                    <TextInput
-                      autoCapitalize="words"
-                      autoCorrect={false}
-                      onChangeText={setEditingName}
-                      onSubmitEditing={handleRename}
-                      placeholder="Category name"
-                      placeholderTextColor={theme.colors.placeholder}
-                      returnKeyType="done"
-                      style={styles.rowInput}
-                      value={editingName}
-                    />
-                    <PressableScale hitSlop={8} onPress={cancelEdit} scaleTo={0.9}>
-                      <X color={theme.colors.muted} size={17} strokeWidth={2} />
-                    </PressableScale>
-                    <PressableScale onPress={handleRename} style={styles.iconAction}>
-                      <Check color={theme.colors.primaryForeground} size={16} strokeWidth={2.5} />
-                    </PressableScale>
-                  </>
-                ) : (
-                  <>
-                    <PressableScale
-                      onPress={() => {
-                        selectionChange();
-                        setEditingId(category.id);
-                        setEditingEmoji(category.emoji);
-                        setEditingName(category.name);
-                      }}
-                      style={styles.rowMain}
-                    >
-                      <View style={styles.categoryIcon}>
-                        <Text style={styles.categoryEmoji}>{category.emoji}</Text>
-                      </View>
-                      <View style={styles.rowCopy}>
-                        <Text style={styles.rowLabel}>{category.name}</Text>
-                        <Text style={styles.rowHint}>Shown on subscription forms and lists</Text>
-                      </View>
-                    </PressableScale>
-                    <PressableScale
-                      hitSlop={8}
-                      onPress={() => {
-                        selectionChange();
-                        setEditingId(category.id);
-                        setEditingEmoji(category.emoji);
-                        setEditingName(category.name);
-                      }}
-                      scaleTo={0.9}
-                    >
-                      <Pencil color={theme.colors.iconMuted} size={16} strokeWidth={2} />
-                    </PressableScale>
-                    <PressableScale
-                      hitSlop={8}
-                      onPress={() => confirmArchive(category.id, category.name)}
-                      scaleTo={0.9}
-                    >
-                      <Trash2 color={theme.colors.iconMuted} size={16} strokeWidth={2} />
-                    </PressableScale>
-                  </>
-                )}
-              </View>
-            );
-          })}
-        </View>
+      <FlashList
+        contentContainerStyle={styles.scroll}
+        data={visibleCategories}
+        keyExtractor={(item) => item.id}
+        keyboardDismissMode="on-drag"
+        keyboardShouldPersistTaps="handled"
+        ListEmptyComponent={emptyState}
+        ListHeaderComponent={categories.length > 0 ? listHeader : null}
+        renderItem={renderItem}
+        showsVerticalScrollIndicator={false}
+      />
+
+      <FabButton accessibilityLabel="Add category" onPress={openAdd} />
+    </View>
+  );
+}
+
+function buildCategoryMetrics(subscriptions: SubscriptionSummary[]) {
+  const metrics = new Map<string, CategoryMetrics>();
+  const now = new Date();
+
+  for (const subscription of subscriptions) {
+    const current = metrics.get(subscription.categoryId) ?? {
+      activeCount: 0,
+      dueSoonCount: 0,
+      monthlyExpenses: 0,
+    };
+
+    if (subscription.isActive) {
+      current.activeCount += 1;
+      current.monthlyExpenses += getMonthlyEquivalent(subscription.costAmount, subscription.recurrence);
+
+      if (toSubscriptionListItemView(subscription, now).isDueSoon) {
+        current.dueSoonCount += 1;
+      }
+    }
+
+    metrics.set(subscription.categoryId, current);
+  }
+
+  return metrics;
+}
+
+function formatCategoryMetrics(metrics?: CategoryMetrics): string {
+  if (!metrics || metrics.activeCount === 0) {
+    return "No active subscriptions";
+  }
+
+  const subscriptionCopy = `${metrics.activeCount} active`;
+  const monthlyCopy = `${formatCurrency(Math.round(metrics.monthlyExpenses))}/mo`;
+
+  if (metrics.dueSoonCount > 0) {
+    return `${subscriptionCopy} · ${monthlyCopy} · ${metrics.dueSoonCount} due soon`;
+  }
+
+  return `${subscriptionCopy} · ${monthlyCopy}`;
+}
+
+function CategoryRow({
+  category,
+  metrics,
+  onPress,
+}: {
+  category: Category;
+  metrics?: CategoryMetrics;
+  onPress: () => void;
+}) {
+  return (
+    <PressableScale onPress={onPress} style={styles.row}>
+      <Text style={styles.rowEmoji}>{category.emoji}</Text>
+      <View style={styles.rowBody}>
+        <Text numberOfLines={1} style={styles.rowTitle}>
+          {category.name}
+        </Text>
+        <Text numberOfLines={1} style={styles.rowSubtitle}>
+          {formatCategoryMetrics(metrics)}
+        </Text>
       </View>
-    </ScrollView>
+    </PressableScale>
   );
 }
 
 const styles = StyleSheet.create((theme) => ({
-  content: {
-    gap: 20,
+  screen: {
+    flex: 1,
+    backgroundColor: theme.colors.background,
+  },
+  header: {
     paddingHorizontal: 20,
-    paddingTop: 16,
-    paddingBottom: 40,
-  },
-  section: {
-    gap: 10,
-  },
-  sectionTitle: {
-    fontSize: 11,
-    fontWeight: "700",
-    color: theme.colors.muted,
-    textTransform: "uppercase",
-    letterSpacing: 1.6,
-  },
-  createCard: {
+    paddingTop: 10,
+    paddingBottom: 12,
     flexDirection: "row",
     alignItems: "center",
-    gap: 12,
-    backgroundColor: theme.colors.card,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
   },
-  listCard: {
-    backgroundColor: theme.colors.card,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-    overflow: "hidden",
+  scroll: {
+    paddingHorizontal: 20,
+    paddingTop: 4,
+    paddingBottom: FAB_SCROLL_PADDING,
   },
-  input: {
-    flex: 1,
-    fontSize: 14,
-    color: theme.colors.text,
-    padding: 0,
+  summary: {
+    paddingBottom: 12,
   },
-  emojiInput: {
-    width: 44,
-    height: 44,
-    borderRadius: 999,
-    backgroundColor: theme.colors.surface,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-    textAlign: "center",
-    fontSize: 20,
-    color: theme.colors.text,
-  },
-  action: {
-    paddingHorizontal: 12,
-    paddingVertical: 7,
-    borderRadius: 999,
-    backgroundColor: theme.colors.primary,
-  },
-  actionText: {
+  summaryText: {
     fontSize: 12,
-    fontWeight: "700",
-    color: theme.colors.primaryForeground,
+    fontWeight: "600",
+    color: theme.colors.muted,
   },
   row: {
     flexDirection: "row",
     alignItems: "center",
     gap: 12,
-    minHeight: 52,
-    paddingHorizontal: 16,
     paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.border,
   },
-  rowBorder: {
-    borderTopWidth: 1,
-    borderTopColor: theme.colors.border,
+  rowEmoji: {
+    width: 32,
+    fontSize: 22,
+    textAlign: "center",
   },
-  rowMain: {
-    flex: 1,
-    minWidth: 0,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
-  },
-  categoryIcon: {
-    width: 38,
-    height: 38,
-    borderRadius: 999,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: theme.name === "dark" ? "#1E2A5F" : "#EEF2FF",
-  },
-  categoryEmoji: {
-    fontSize: 18,
-  },
-  rowCopy: {
+  rowBody: {
     flex: 1,
     minWidth: 0,
   },
-  rowLabel: {
-    fontSize: 14,
+  rowTitle: {
+    fontSize: 15,
     fontWeight: "500",
+    lineHeight: 20,
     color: theme.colors.text,
   },
-  rowHint: {
+  rowSubtitle: {
     fontSize: 12,
+    lineHeight: 17,
     color: theme.colors.muted,
     marginTop: 2,
   },
-  editEmojiInput: {
-    width: 38,
-    height: 38,
-    borderRadius: 999,
+  empty: {
+    alignItems: "center",
+    paddingVertical: 64,
+    paddingHorizontal: 24,
+  },
+  emptyIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: 16,
     backgroundColor: theme.colors.surface,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-    textAlign: "center",
-    fontSize: 18,
-    color: theme.colors.text,
-  },
-  rowInput: {
-    flex: 1,
-    fontSize: 14,
-    color: theme.colors.text,
-    padding: 0,
-  },
-  iconAction: {
-    width: 32,
-    height: 32,
-    borderRadius: 999,
     alignItems: "center",
     justifyContent: "center",
+    marginBottom: 12,
+  },
+  emptyTitle: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: theme.colors.icon,
+  },
+  emptyCopy: {
+    fontSize: 12,
+    color: theme.colors.mutedLight,
+    marginTop: 4,
+    textAlign: "center",
+  },
+  emptyCta: {
+    marginTop: 16,
+    borderRadius: 999,
     backgroundColor: theme.colors.primary,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+  },
+  emptyCtaText: {
+    fontSize: 12,
+    fontWeight: "700",
+    color: theme.colors.primaryForeground,
   },
 }));
