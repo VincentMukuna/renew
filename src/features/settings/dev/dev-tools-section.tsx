@@ -4,6 +4,7 @@ import { ChevronRight } from "lucide-react-native";
 import { StyleSheet } from "react-native-unistyles";
 
 import { PressableScale } from "@/components/shared/pressable-scale";
+import { subtleCardShadow } from "@/components/ui/card";
 import { resetOnboardingState } from "@/features/onboarding/lib/onboarding-storage";
 import { selectionChange } from "@/lib/haptics";
 
@@ -141,11 +142,7 @@ const styles = StyleSheet.create((theme) => ({
     borderWidth: 1,
     borderColor: theme.colors.border,
     overflow: "hidden",
-    shadowColor: theme.colors.shadow,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    elevation: 1,
+    ...subtleCardShadow(theme),
   },
   row: {
     flexDirection: "row",

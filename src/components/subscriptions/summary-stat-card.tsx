@@ -2,6 +2,7 @@ import { View } from "react-native";
 
 import { StyleSheet } from "react-native-unistyles";
 
+import { subtleCardShadow } from "@/components/ui/card";
 import { Text } from "@/components/ui/text";
 
 type SummaryStatCardProps = {
@@ -27,11 +28,7 @@ const styles = StyleSheet.create((theme) => ({
     padding: 14,
     borderWidth: 1,
     borderColor: theme.colors.border,
-    shadowColor: theme.colors.shadow,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    elevation: 1,
+    ...subtleCardShadow(theme),
   },
   label: {
     fontSize: 11,
