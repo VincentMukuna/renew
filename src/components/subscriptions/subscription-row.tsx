@@ -27,7 +27,7 @@ function SubscriptionRowComponent({
   return (
     <PressableScale
       onPress={() => onPress?.(subscription.id)}
-      style={[styles.row, !subscription.isActive && styles.inactiveRow, style]}
+      style={[styles.row, style]}
     >
       <View style={styles.avatar}>
         <Text style={styles.avatarText}>{subscription.initials}</Text>
@@ -64,9 +64,6 @@ const styles = StyleSheet.create((theme) => ({
     borderBottomWidth: 1,
     borderBottomColor: theme.colors.border,
   },
-  inactiveRow: {
-    opacity: 0.58,
-  },
   avatar: {
     width: 44,
     height: 44,
@@ -99,12 +96,12 @@ const styles = StyleSheet.create((theme) => ({
   badge: {
     overflow: "hidden",
     borderRadius: 999,
-    backgroundColor: theme.colors.surface,
+    backgroundColor: theme.colors.status.inactive.bg,
     paddingHorizontal: 6,
     paddingVertical: 2,
     fontSize: 10,
     fontWeight: "700",
-    color: theme.colors.muted,
+    color: theme.colors.status.inactive.text,
     textTransform: "uppercase",
   },
   rowSubtitle: {
