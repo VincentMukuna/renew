@@ -4,10 +4,7 @@ import { APP_CONFIG } from "@/constants/config";
 import { useSettingsStore } from "@/features/settings/hooks/use-settings-store";
 import { getItem, setItem, storageKeys } from "@/lib/storage/local-storage";
 import { applyBrandColorTheme } from "@/styles/apply-brand-theme";
-import {
-  DEFAULT_BRAND_COLOR_THEME,
-  type BrandColorThemeId,
-} from "@/styles/brand-themes";
+import { type BrandColorThemeId, DEFAULT_BRAND_COLOR_THEME } from "@/styles/brand-themes";
 import { type AppThemeName, type ThemePreference, appThemes } from "@/styles/themes";
 
 export type PersistedSettings = {

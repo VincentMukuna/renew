@@ -28,8 +28,7 @@ import { selectionChange } from "@/lib/haptics";
 import type { Category } from "@/types";
 
 const SHEET_CONTAINER = (Platform.OS === "ios" ? FullWindowOverlay : undefined) as
-  | ComponentType<{ children?: ReactNode }>
-  | undefined;
+  ComponentType<{ children?: ReactNode }> | undefined;
 
 function normalizeCategoryQuery(value: string): string {
   return value.trim().toLowerCase();

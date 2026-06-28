@@ -114,7 +114,9 @@ export function SubscriptionDetailScreen() {
             <View style={styles.switchRow}>
               <View style={styles.switchCopy}>
                 <Text style={styles.detailValue}>Active</Text>
-                <Text style={styles.detailHint}>Include in metrics and upcoming charge reminders.</Text>
+                <Text style={styles.detailHint}>
+                  Include in metrics and upcoming charge reminders.
+                </Text>
               </View>
               <Switch
                 onValueChange={handleActiveChange}

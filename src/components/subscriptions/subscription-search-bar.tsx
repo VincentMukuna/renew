@@ -16,46 +16,50 @@ export type SubscriptionSearchBarRef = {
   focus: () => void;
 };
 
-const SubscriptionSearchBarInner = forwardRef<
-  SubscriptionSearchBarRef,
-  SubscriptionSearchBarProps
->(({ value, onChangeText, placeholder = "Search by name or plan", variant = "default" }, ref) => {
-  const inputRef = useRef<TextInputType>(null);
-  const { theme } = useUnistyles();
+const SubscriptionSearchBarInner = forwardRef<SubscriptionSearchBarRef, SubscriptionSearchBarProps>(
+  ({ value, onChangeText, placeholder = "Search by name or plan", variant = "default" }, ref) => {
+    const inputRef = useRef<TextInputType>(null);
+    const { theme } = useUnistyles();
 
-  useImperativeHandle(ref, () => ({
-    focus: () => {
-      inputRef.current?.focus();
-    },
-  }));
+    useImperativeHandle(ref, () => ({
+      focus: () => {
+        inputRef.current?.focus();
+      },
+    }));
 
-  const clear = useCallback(() => {
-    onChangeText("");
-  }, [onChangeText]);
+    const clear = useCallback(() => {
+      onChangeText("");
+    }, [onChangeText]);
 
-  return (
-    <View style={[styles.wrap, variant === "header" && styles.wrapHeader]}>
-      <Search color={theme.colors.muted} size={16} strokeWidth={2} />
-      <TextInput
-        ref={inputRef}
-        autoCapitalize="none"
-        autoCorrect={false}
-        clearButtonMode="never"
-        onChangeText={onChangeText}
-        placeholder={placeholder}
-        placeholderTextColor={theme.colors.mutedLight}
-        returnKeyType="search"
-        style={styles.input}
-        value={value}
-      />
-      {value.length > 0 ? (
-        <Pressable accessibilityLabel="Clear search" hitSlop={8} onPress={clear} style={styles.clear}>
-          <X color={theme.colors.muted} size={14} strokeWidth={2.5} />
-        </Pressable>
-      ) : null}
-    </View>
-  );
-});
+    return (
+      <View style={[styles.wrap, variant === "header" && styles.wrapHeader]}>
+        <Search color={theme.colors.muted} size={16} strokeWidth={2} />
+        <TextInput
+          ref={inputRef}
+          autoCapitalize="none"
+          autoCorrect={false}
+          clearButtonMode="never"
+          onChangeText={onChangeText}
+          placeholder={placeholder}
+          placeholderTextColor={theme.colors.mutedLight}
+          returnKeyType="search"
+          style={styles.input}
+          value={value}
+        />
+        {value.length > 0 ? (
+          <Pressable
+            accessibilityLabel="Clear search"
+            hitSlop={8}
+            onPress={clear}
+            style={styles.clear}
+          >
+            <X color={theme.colors.muted} size={14} strokeWidth={2.5} />
+          </Pressable>
+        ) : null}
+      </View>
+    );
+  },
+);
 
 SubscriptionSearchBarInner.displayName = "SubscriptionSearchBar";
 

@@ -4,8 +4,8 @@ import { ScrollView, Switch, Text, TextInput, View } from "react-native";
 
 import { router, useLocalSearchParams, useNavigation } from "expo-router";
 
-import { zodResolver } from "@hookform/resolvers/zod";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Calendar, ChevronRight, X } from "lucide-react-native";
 import { Controller, useForm, useWatch } from "react-hook-form";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
@@ -13,6 +13,7 @@ import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { HeaderSaveButton } from "@/components/navigation/header-save-button";
 import { PressableScale } from "@/components/shared/pressable-scale";
 import { completeOnboarding } from "@/features/onboarding/lib/onboarding-storage";
+import { useSettingsStore } from "@/features/settings/hooks/use-settings-store";
 import {
   CategoryPickerSheet,
   type CategoryPickerSheetRef,
@@ -24,17 +25,13 @@ import {
 import { StartDatePickerModal } from "@/features/subscriptions/components/start-date-picker-modal";
 import { useAddSubscription } from "@/features/subscriptions/hooks/use-add-subscription";
 import { useCategories } from "@/features/subscriptions/hooks/use-categories";
-import {
-  formatStartDate,
-  resolveQuickDate,
-} from "@/features/subscriptions/lib/format-dates";
+import { formatStartDate, resolveQuickDate } from "@/features/subscriptions/lib/format-dates";
 import { recurrenceLabels } from "@/features/subscriptions/lib/recurrence";
 import {
+  type AddSubscriptionFormValues,
   addSubscriptionSchema,
   formValuesToCreateInput,
-  type AddSubscriptionFormValues,
 } from "@/features/subscriptions/schemas/subscription-schemas";
-import { useSettingsStore } from "@/features/settings/hooks/use-settings-store";
 import { selectionChange } from "@/lib/haptics";
 import { HOME_ROUTE } from "@/lib/navigation/routes";
 import { formatCurrencyPrefix } from "@/lib/utils/formatters";
@@ -324,7 +321,9 @@ export function AddSubscriptionScreen() {
               <View style={styles.prefRow}>
                 <View style={styles.prefCopy}>
                   <Text style={styles.prefTitle}>Active</Text>
-                  <Text style={styles.prefSub}>Include in spending metrics and renewal tracking</Text>
+                  <Text style={styles.prefSub}>
+                    Include in spending metrics and renewal tracking
+                  </Text>
                 </View>
                 <Switch
                   onValueChange={(nextValue) => {

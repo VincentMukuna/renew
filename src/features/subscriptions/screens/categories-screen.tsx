@@ -152,7 +152,10 @@ function buildCategoryMetrics(subscriptions: SubscriptionSummary[]) {
 
     if (subscription.isActive) {
       current.activeCount += 1;
-      current.monthlyExpenses += getMonthlyEquivalent(subscription.costAmount, subscription.recurrence);
+      current.monthlyExpenses += getMonthlyEquivalent(
+        subscription.costAmount,
+        subscription.recurrence,
+      );
 
       if (toSubscriptionListItemView(subscription, now).isDueSoon) {
         current.dueSoonCount += 1;

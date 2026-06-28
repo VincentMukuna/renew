@@ -1,11 +1,5 @@
 export type BrandColorThemeId =
-  | "indigo"
-  | "plum"
-  | "forest"
-  | "warmBronze"
-  | "deepRose"
-  | "teal"
-  | "stone";
+  "indigo" | "plum" | "forest" | "warmBronze" | "deepRose" | "teal" | "stone";
 
 export type BrandColorPalette = {
   primary: string;

@@ -1,5 +1,9 @@
+import {
+  DEFAULT_BRAND_COLOR_THEME,
+  buildBrandColorOverrides,
+  getBrandColorTheme,
+} from "./brand-themes";
 import { darkStatusColors, lightStatusColors } from "./tokens";
-import { DEFAULT_BRAND_COLOR_THEME, buildBrandColorOverrides, getBrandColorTheme } from "./brand-themes";
 
 const defaultBrand = getBrandColorTheme(DEFAULT_BRAND_COLOR_THEME);
 

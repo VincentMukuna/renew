@@ -25,10 +25,7 @@ function SubscriptionRowComponent({
     : subscription.planName;
 
   return (
-    <PressableScale
-      onPress={() => onPress?.(subscription.id)}
-      style={[styles.row, style]}
-    >
+    <PressableScale onPress={() => onPress?.(subscription.id)} style={[styles.row, style]}>
       <View style={styles.avatar}>
         <Text style={styles.avatarText}>{subscription.initials}</Text>
       </View>

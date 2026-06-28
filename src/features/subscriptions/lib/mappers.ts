@@ -5,7 +5,9 @@ import type {
   SubscriptionStatsView,
   SubscriptionSummary,
 } from "@/features/subscriptions/view-models";
-import { formatRenewalDate, formatStartDate, toISODate, isoDateToDate } from "./format-dates";
+import { formatCurrency, getInitials } from "@/lib/utils/formatters";
+
+import { formatRenewalDate, formatStartDate, isoDateToDate, toISODate } from "./format-dates";
 import {
   getCompletedBillingCycles,
   getMonthlyEquivalent,
@@ -15,7 +17,6 @@ import {
   isDueToday,
   recurrenceLabels,
 } from "./recurrence";
-import { formatCurrency, getInitials } from "@/lib/utils/formatters";
 
 export function toSubscriptionListItemView(
   subscription: SubscriptionSummary,
@@ -40,8 +41,7 @@ export function toSubscriptionListItemView(
     nextRenewalDate,
     isActive: subscription.isActive,
     isDueToday: subscription.isActive && isDueToday(nextRenewal, now),
-    isDueSoon:
-      subscription.isActive && isDueSoon(nextRenewal, now, APP_CONFIG.dueSoonDays),
+    isDueSoon: subscription.isActive && isDueSoon(nextRenewal, now, APP_CONFIG.dueSoonDays),
   };
 }
 

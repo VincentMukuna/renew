@@ -209,8 +209,7 @@ export function toCalendarSubscriptionRow(
         : formatRenewalDate(renewal.date),
     nextRenewalDate: renewal.date,
     isActive: subscription.isActive,
-    isDueToday:
-      subscription.isActive && isDueToday(isoDateToDate(renewal.date), new Date()),
+    isDueToday: subscription.isActive && isDueToday(isoDateToDate(renewal.date), new Date()),
     isDueSoon: false,
   };
 }

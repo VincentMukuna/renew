@@ -12,20 +12,23 @@ import { subtleCardShadow } from "@/components/ui/card";
 import { useSettingsStore } from "@/features/settings/hooks/use-settings-store";
 import { saveBrandColorTheme } from "@/features/settings/lib/settings-storage";
 import { selectionChange } from "@/lib/haptics";
-import { brandColorThemeList, type BrandColorThemeDefinition } from "@/styles/brand-themes";
+import { type BrandColorThemeDefinition, brandColorThemeList } from "@/styles/brand-themes";
 
 export function BrandColorScreen() {
   const { theme } = useUnistyles();
   const selectedBrandId = useSettingsStore((state) => state.brandColorTheme);
 
-  const handleSelect = useCallback(async (brandId: BrandColorThemeDefinition["id"]) => {
-    if (brandId === selectedBrandId) {
-      return;
-    }
+  const handleSelect = useCallback(
+    async (brandId: BrandColorThemeDefinition["id"]) => {
+      if (brandId === selectedBrandId) {
+        return;
+      }
 
-    selectionChange();
-    await saveBrandColorTheme(brandId);
-  }, [selectedBrandId]);
+      selectionChange();
+      await saveBrandColorTheme(brandId);
+    },
+    [selectedBrandId],
+  );
 
   return (
     <View style={styles.screen}>

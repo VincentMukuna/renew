@@ -6,10 +6,7 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import { PressableScale } from "@/components/shared/pressable-scale";
-import {
-  isoDateToDate,
-  toISODate,
-} from "@/features/subscriptions/lib/format-dates";
+import { isoDateToDate, toISODate } from "@/features/subscriptions/lib/format-dates";
 
 type StartDatePickerModalProps = {
   visible: boolean;

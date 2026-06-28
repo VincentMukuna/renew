@@ -27,8 +27,7 @@ import { selectionChange } from "@/lib/haptics";
 import type { Recurrence } from "@/types";
 
 const SHEET_CONTAINER = (Platform.OS === "ios" ? FullWindowOverlay : undefined) as
-  | ComponentType<{ children?: ReactNode }>
-  | undefined;
+  ComponentType<{ children?: ReactNode }> | undefined;
 
 export type RecurrencePickerSheetRef = {
   present: () => void;

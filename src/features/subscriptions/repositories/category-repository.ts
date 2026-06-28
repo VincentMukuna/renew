@@ -1,7 +1,7 @@
+import type { CategoryDetailView } from "@/features/subscriptions/view-models";
 import { getDb } from "@/lib/db/client";
 import type { CategoriesRow } from "@/lib/db/row-types";
 import { createId } from "@/lib/id";
-import type { CategoryDetailView } from "@/features/subscriptions/view-models";
 import type { Category } from "@/types";
 
 function toCategory(row: CategoriesRow): Category {

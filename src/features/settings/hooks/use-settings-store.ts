@@ -1,7 +1,7 @@
 import { create } from "zustand";
 
 import { APP_CONFIG } from "@/constants/config";
-import { DEFAULT_BRAND_COLOR_THEME, type BrandColorThemeId } from "@/styles/brand-themes";
+import { type BrandColorThemeId, DEFAULT_BRAND_COLOR_THEME } from "@/styles/brand-themes";
 import type { ThemePreference } from "@/styles/themes";
 
 type SettingsState = {

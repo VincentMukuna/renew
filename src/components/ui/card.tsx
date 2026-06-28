@@ -4,7 +4,9 @@ import { StyleSheet } from "react-native-unistyles";
 
 import type { AppTheme } from "@/styles/themes";
 
-export function subtleCardShadow(theme: AppTheme): Pick<
+export function subtleCardShadow(
+  theme: AppTheme,
+): Pick<
   ViewStyle,
   "shadowColor" | "shadowOffset" | "shadowOpacity" | "shadowRadius" | "elevation"
 > {

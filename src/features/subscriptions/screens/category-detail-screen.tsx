@@ -2,27 +2,21 @@ import { useCallback, useMemo } from "react";
 
 import { Alert, ScrollView, Text, View } from "react-native";
 
+import { LinearGradient } from "expo-linear-gradient";
 import { Redirect, Stack, router, useLocalSearchParams } from "expo-router";
 
-import { LinearGradient } from "expo-linear-gradient";
 import { Trash2 } from "lucide-react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import { PressableScale } from "@/components/shared/pressable-scale";
 import { SubscriptionRow } from "@/components/subscriptions/subscription-row";
-import { useArchiveCategory } from "@/features/subscriptions/hooks/use-category-mutations";
 import { useCategory } from "@/features/subscriptions/hooks/use-categories";
+import { useArchiveCategory } from "@/features/subscriptions/hooks/use-category-mutations";
 import { useSubscriptionSummaries } from "@/features/subscriptions/hooks/use-subscriptions";
 import { toSubscriptionListItemView } from "@/features/subscriptions/lib/mappers";
-import {
-  getMonthlyEquivalent,
-  getYearlyEquivalent,
-} from "@/features/subscriptions/lib/recurrence";
-import type {
-  CategoryDetailView,
-  SubscriptionSummary,
-} from "@/features/subscriptions/view-models";
+import { getMonthlyEquivalent, getYearlyEquivalent } from "@/features/subscriptions/lib/recurrence";
+import type { CategoryDetailView, SubscriptionSummary } from "@/features/subscriptions/view-models";
 import { selectionChange } from "@/lib/haptics";
 import { formatCurrency } from "@/lib/utils/formatters";
 
@@ -71,21 +65,14 @@ export function CategoryDetailScreen() {
   return <CategoryDetailContent category={category} id={id} />;
 }
 
-function CategoryDetailContent({
-  category,
-  id,
-}: {
-  category: CategoryDetailView;
-  id: string;
-}) {
+function CategoryDetailContent({ category, id }: { category: CategoryDetailView; id: string }) {
   const { theme } = useUnistyles();
   const insets = useSafeAreaInsets();
   const archiveCategory = useArchiveCategory();
   const { data: subscriptionSummaries = [] } = useSubscriptionSummaries();
 
   const categorySubscriptions = useMemo(
-    () =>
-      subscriptionSummaries.filter((subscription) => subscription.categoryId === id),
+    () => subscriptionSummaries.filter((subscription) => subscription.categoryId === id),
     [id, subscriptionSummaries],
   );
 

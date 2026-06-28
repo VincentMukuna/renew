@@ -9,11 +9,11 @@ import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { TabScreen } from "@/components/navigation/tab-screen";
 import { BellButton } from "@/components/shared/bell-button";
 import { FAB_SCROLL_PADDING, FabButton } from "@/components/shared/fab-button";
-import { SummaryStatCard } from "@/components/subscriptions/summary-stat-card";
 import { SubscriptionRow } from "@/components/subscriptions/subscription-row";
+import { SummaryStatCard } from "@/components/subscriptions/summary-stat-card";
 import {
-  useSubscriptions,
   useSubscriptionStats,
+  useSubscriptions,
 } from "@/features/subscriptions/hooks/use-subscriptions";
 import { sortByRenewalDate } from "@/features/subscriptions/lib/subscription-list-utils";
 import type { SubscriptionListItemView } from "@/features/subscriptions/view-models";
@@ -213,8 +213,7 @@ const styles = StyleSheet.create((theme) => ({
   heroLabel: {
     fontSize: 11,
     fontWeight: "600",
-    color:
-      theme.name === "dark" ? "rgba(255,255,255,0.68)" : theme.colors.onPrimarySurfaceMuted,
+    color: theme.name === "dark" ? "rgba(255,255,255,0.68)" : theme.colors.onPrimarySurfaceMuted,
     textTransform: "uppercase",
     letterSpacing: 1.6,
   },
@@ -228,8 +227,7 @@ const styles = StyleSheet.create((theme) => ({
   },
   heroMeta: {
     fontSize: 12,
-    color:
-      theme.name === "dark" ? "rgba(255,255,255,0.52)" : theme.colors.onPrimarySurfaceSubtle,
+    color: theme.name === "dark" ? "rgba(255,255,255,0.52)" : theme.colors.onPrimarySurfaceSubtle,
     marginTop: 8,
   },
   statsGrid: {

@@ -30,7 +30,10 @@ export async function runMigrations(db: SQLiteDatabase): Promise<void> {
   for (const pendingMigration of pending) {
     await db.withTransactionAsync(async () => {
       await db.execAsync(pendingMigration.sql);
-      await db.runAsync("INSERT INTO schema_migrations (version) VALUES (?)", pendingMigration.version);
+      await db.runAsync(
+        "INSERT INTO schema_migrations (version) VALUES (?)",
+        pendingMigration.version,
+      );
     });
   }
 }
