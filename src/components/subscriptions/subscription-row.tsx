@@ -30,7 +30,7 @@ function SubscriptionRowComponent({ subscription, onPress, style }: Subscription
           {!subscription.isActive ? <Text style={styles.badge}>Inactive</Text> : null}
         </View>
         <Text numberOfLines={1} style={styles.rowSubtitle}>
-          {subscription.planName} · {subscription.categoryName}
+          {subscription.planName} · {subscription.categoryEmoji} {subscription.categoryName}
         </Text>
       </View>
       <View style={styles.rowMeta}>

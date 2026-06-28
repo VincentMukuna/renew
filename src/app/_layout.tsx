@@ -11,6 +11,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { UnistylesRuntime, useUnistyles } from "react-native-unistyles";
 
 import { Toast } from "@/components/shared/toast";
+import { hydrateOnboardingState } from "@/features/onboarding/lib/onboarding-storage";
 import { bootstrapCurrency } from "@/features/settings/lib/bootstrap-currency";
 import { hydratePersistedSettings } from "@/features/settings/lib/settings-storage";
 import { queryClient } from "@/lib/api/query-client";
@@ -26,11 +27,13 @@ export default function RootLayout() {
   const modalOptions = getModalScreenOptions(theme);
 
   useEffect(() => {
-    void Promise.all([getDb(), bootstrapCurrency().then(() => hydratePersistedSettings())]).then(
-      () => {
-        setAppReady(true);
-      },
-    );
+    void Promise.all([
+      getDb(),
+      bootstrapCurrency().then(() => hydratePersistedSettings()),
+      hydrateOnboardingState(),
+    ]).then(() => {
+      setAppReady(true);
+    });
   }, []);
 
   useEffect(() => {
@@ -61,6 +64,7 @@ export default function RootLayout() {
             }}
           >
             <Stack.Screen name="index" />
+            <Stack.Screen name="onboarding" options={{ animation: "fade" }} />
             <Stack.Screen name="(tabs)" />
             <Stack.Screen
               name="add-subscription"

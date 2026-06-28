@@ -16,6 +16,7 @@ export type SubscriptionSummary = {
   id: string;
   categoryId: string;
   categoryName: string;
+  categoryEmoji: string;
   name: string;
   planName: string;
   costAmount: number;
@@ -32,6 +33,7 @@ export type SubscriptionListItemView = {
   name: string;
   planName: string;
   categoryName: string;
+  categoryEmoji: string;
   amountLabel: string;
   renewalLabel: string;
   nextRenewalDate: string;

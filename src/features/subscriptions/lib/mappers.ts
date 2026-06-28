@@ -33,6 +33,7 @@ export function toSubscriptionListItemView(
     name: subscription.name,
     planName: subscription.planName,
     categoryName: subscription.categoryName,
+    categoryEmoji: subscription.categoryEmoji,
     amountLabel: formatCurrency(subscription.costAmount),
     renewalLabel: formatRenewalDate(nextRenewalDate),
     nextRenewalDate,

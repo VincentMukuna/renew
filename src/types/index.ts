@@ -11,6 +11,7 @@ export type Recurrence =
 export type Category = {
   id: string;
   name: string;
+  emoji: string;
   sortOrder: number;
   archivedAt: string | null;
   createdAt: string;

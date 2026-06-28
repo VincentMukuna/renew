@@ -2,7 +2,7 @@ import { useCallback, useLayoutEffect, useMemo, useRef, useState } from "react";
 
 import { ScrollView, Switch, Text, TextInput, View } from "react-native";
 
-import { router, useNavigation } from "expo-router";
+import { router, useLocalSearchParams, useNavigation } from "expo-router";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
@@ -12,6 +12,7 @@ import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import { HeaderSaveButton } from "@/components/navigation/header-save-button";
 import { PressableScale } from "@/components/shared/pressable-scale";
+import { completeOnboarding } from "@/features/onboarding/lib/onboarding-storage";
 import {
   CategoryPickerSheet,
   type CategoryPickerSheetRef,
@@ -35,7 +36,8 @@ import {
 } from "@/features/subscriptions/schemas/subscription-schemas";
 import { useSettingsStore } from "@/features/settings/hooks/use-settings-store";
 import { selectionChange } from "@/lib/haptics";
-import { formatCurrencyPrefix, getInitials } from "@/lib/utils/formatters";
+import { HOME_ROUTE } from "@/lib/navigation/routes";
+import { formatCurrencyPrefix } from "@/lib/utils/formatters";
 
 const QUICK_DATES = ["Today", "Tomorrow", "Friday", "Next week"];
 
@@ -58,6 +60,8 @@ function exitAddSubscription() {
 export function AddSubscriptionScreen() {
   const { theme } = useUnistyles();
   const navigation = useNavigation();
+  const { from } = useLocalSearchParams<{ from?: string }>();
+  const fromOnboarding = from === "onboarding";
   const addSubscription = useAddSubscription();
   const { data: categories = [] } = useCategories();
   const defaultCurrency = useSettingsStore((state) => state.defaultCurrency);
@@ -106,12 +110,18 @@ export function AddSubscriptionScreen() {
   const onSubmit = useCallback(
     (values: AddSubscriptionFormValues) => {
       addSubscription.mutate(formValuesToCreateInput(values), {
-        onSuccess: () => {
+        onSuccess: async () => {
+          if (fromOnboarding) {
+            await completeOnboarding();
+            router.dismissTo(HOME_ROUTE);
+            return;
+          }
+
           exitAddSubscription();
         },
       });
     },
-    [addSubscription],
+    [addSubscription, fromOnboarding],
   );
 
   const handleSave = useCallback(() => {
@@ -165,9 +175,7 @@ export function AddSubscriptionScreen() {
                 <View style={styles.categoryChip}>
                   <PressableScale onPress={openCategoryPicker} style={styles.categoryChipMain}>
                     <View style={styles.categoryAvatar}>
-                      <Text style={styles.categoryAvatarText}>
-                        {getInitials(selectedCategory.name)}
-                      </Text>
+                      <Text style={styles.categoryAvatarText}>{selectedCategory.emoji}</Text>
                     </View>
                     <Text numberOfLines={1} style={styles.categoryChipName}>
                       {selectedCategory.name}
@@ -451,9 +459,7 @@ const styles = StyleSheet.create((theme) => ({
     backgroundColor: theme.colors.surfaceMuted,
   },
   categoryAvatarText: {
-    fontSize: 13,
-    fontWeight: "700",
-    color: theme.colors.icon,
+    fontSize: 17,
   },
   categoryChipName: {
     flex: 1,

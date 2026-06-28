@@ -25,7 +25,6 @@ import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import { PressableScale } from "@/components/shared/pressable-scale";
 import { selectionChange } from "@/lib/haptics";
-import { getInitials } from "@/lib/utils/formatters";
 import type { Category } from "@/types";
 
 const SHEET_CONTAINER = (Platform.OS === "ios" ? FullWindowOverlay : undefined) as
@@ -74,7 +73,7 @@ export const CategoryPickerSheet = forwardRef<CategoryPickerSheetRef, CategoryPi
       }
 
       return categories.filter((category) =>
-        normalizeCategoryQuery(category.name).includes(normalizedQuery),
+        normalizeCategoryQuery(`${category.emoji} ${category.name}`).includes(normalizedQuery),
       );
     }, [categories, normalizedQuery]);
 
@@ -223,7 +222,7 @@ function CategoryRow({ category, isExactMatch, isSelected, onPress }: CategoryRo
   return (
     <PressableScale onPress={onPress} style={[styles.row, highlighted && styles.rowMatch]}>
       <View style={styles.avatar}>
-        <Text style={styles.avatarText}>{getInitials(category.name)}</Text>
+        <Text style={styles.avatarText}>{category.emoji}</Text>
       </View>
       <View style={styles.rowBody}>
         <Text numberOfLines={1} style={styles.rowName}>
@@ -300,9 +299,7 @@ const styles = StyleSheet.create((theme) => ({
     backgroundColor: theme.colors.surfaceMuted,
   },
   avatarText: {
-    fontSize: 14,
-    fontWeight: "700",
-    color: theme.colors.icon,
+    fontSize: 18,
   },
   rowBody: {
     flex: 1,

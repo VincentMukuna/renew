@@ -1,6 +1,7 @@
 export type CategoriesRow = {
   id: string;
   name: string;
+  emoji: string;
   sort_order: number;
   archived_at: string | null;
   created_at: string;

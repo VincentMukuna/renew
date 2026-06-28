@@ -26,6 +26,7 @@ function toSubscription(row: SubscriptionsRow): Subscription {
 
 type SubscriptionCategoryRow = SubscriptionsRow & {
   category_name: string;
+  category_emoji: string;
 };
 
 function toSummary(row: SubscriptionCategoryRow): SubscriptionSummary {
@@ -33,6 +34,7 @@ function toSummary(row: SubscriptionCategoryRow): SubscriptionSummary {
     id: row.id,
     categoryId: row.category_id,
     categoryName: row.category_name,
+    categoryEmoji: row.category_emoji,
     name: row.name,
     planName: row.plan_name,
     costAmount: row.cost_amount,
@@ -47,7 +49,8 @@ function toSummary(row: SubscriptionCategoryRow): SubscriptionSummary {
 const SUBSCRIPTION_SUMMARY_SELECT = `
   SELECT
     s.*,
-    c.name AS category_name
+    c.name AS category_name,
+    c.emoji AS category_emoji
   FROM subscriptions s
   INNER JOIN categories c ON c.id = s.category_id
 `;

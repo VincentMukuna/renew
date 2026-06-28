@@ -84,7 +84,10 @@ export function SubscriptionDetailScreen() {
             <Text style={styles.cardLabel}>Plan</Text>
             <View style={styles.detailGrid}>
               <DetailStat label="Name" value={subscription.planName} />
-              <DetailStat label="Category" value={subscription.categoryName} />
+              <DetailStat
+                label="Category"
+                value={`${subscription.categoryEmoji} ${subscription.categoryName}`}
+              />
             </View>
           </View>
 
@@ -136,7 +139,9 @@ function SubscriptionSummary({ subscription }: { subscription: SubscriptionDetai
     <View style={styles.summaryCard}>
       <View style={styles.summaryTop}>
         <Text style={styles.summaryHint}>Subscription cost</Text>
-        <Text style={styles.summaryCategory}>{subscription.categoryName}</Text>
+        <Text style={styles.summaryCategory}>
+          {subscription.categoryEmoji} {subscription.categoryName}
+        </Text>
       </View>
       <Text style={styles.summaryAmount}>{subscription.amountLabel}</Text>
       <Text style={styles.summarySupport}>{support}</Text>

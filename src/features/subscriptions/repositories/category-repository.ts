@@ -7,6 +7,7 @@ function toCategory(row: CategoriesRow): Category {
   return {
     id: row.id,
     name: row.name,
+    emoji: row.emoji,
     sortOrder: row.sort_order,
     archivedAt: row.archived_at,
     createdAt: row.created_at,
@@ -26,7 +27,7 @@ export const categoryRepository = {
     return rows.map(toCategory);
   },
 
-  async create(name: string): Promise<Category> {
+  async create(input: { name: string; emoji: string }): Promise<Category> {
     const db = await getDb();
     const now = new Date().toISOString();
     const row = await db.getFirstAsync<{ sort_order: number | null }>(
@@ -34,7 +35,8 @@ export const categoryRepository = {
     );
     const category: CategoriesRow = {
       id: createId(),
-      name: name.trim(),
+      name: input.name.trim(),
+      emoji: input.emoji.trim(),
       sort_order: (row?.sort_order ?? 0) + 10,
       archived_at: null,
       created_at: now,
@@ -42,23 +44,30 @@ export const categoryRepository = {
     };
 
     await db.runAsync(
-      `INSERT INTO categories (id, name, sort_order, archived_at, created_at, updated_at)
-       VALUES (?, ?, ?, NULL, ?, ?)`,
-      [category.id, category.name, category.sort_order, category.created_at, category.updated_at],
+      `INSERT INTO categories (id, name, emoji, sort_order, archived_at, created_at, updated_at)
+       VALUES (?, ?, ?, ?, NULL, ?, ?)`,
+      [
+        category.id,
+        category.name,
+        category.emoji,
+        category.sort_order,
+        category.created_at,
+        category.updated_at,
+      ],
     );
 
     return toCategory(category);
   },
 
-  async rename(id: string, name: string): Promise<Category> {
+  async update(id: string, input: { name: string; emoji: string }): Promise<Category> {
     const db = await getDb();
     const now = new Date().toISOString();
 
     await db.runAsync(
       `UPDATE categories
-       SET name = ?, updated_at = ?
+       SET name = ?, emoji = ?, updated_at = ?
        WHERE id = ? AND archived_at IS NULL`,
-      [name.trim(), now, id],
+      [input.name.trim(), input.emoji.trim(), now, id],
     );
 
     const row = await db.getFirstAsync<CategoriesRow>("SELECT * FROM categories WHERE id = ?", [
@@ -70,6 +79,17 @@ export const categoryRepository = {
     }
 
     return toCategory(row);
+  },
+
+  async rename(id: string, name: string): Promise<Category> {
+    const existing = await this.list();
+    const category = existing.find((item) => item.id === id);
+
+    if (!category) {
+      throw new Error(`Category not found: ${id}`);
+    }
+
+    return this.update(id, { name, emoji: category.emoji });
   },
 
   async archive(id: string): Promise<void> {

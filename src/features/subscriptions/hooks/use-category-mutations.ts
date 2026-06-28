@@ -9,7 +9,7 @@ export function useCreateCategory() {
   const showToast = useUiStore((state) => state.showToast);
 
   return useMutation({
-    mutationFn: (name: string) => categoryRepository.create(name),
+    mutationFn: (input: { name: string; emoji: string }) => categoryRepository.create(input),
     onSuccess: async () => {
       await invalidateCategoryQueries(queryClient);
       showToast("Category saved.");
@@ -28,8 +28,8 @@ export function useRenameCategory() {
   const showToast = useUiStore((state) => state.showToast);
 
   return useMutation({
-    mutationFn: ({ id, name }: { id: string; name: string }) =>
-      categoryRepository.rename(id, name),
+    mutationFn: ({ id, name, emoji }: { id: string; name: string; emoji: string }) =>
+      categoryRepository.update(id, { name, emoji }),
     onSuccess: async () => {
       await invalidateCategoryQueries(queryClient);
       showToast("Category updated.");

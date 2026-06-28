@@ -4,7 +4,7 @@ import { Alert, ScrollView, Text, TextInput, View } from "react-native";
 
 import { Stack } from "expo-router";
 
-import { Trash2 } from "lucide-react-native";
+import { Check, Pencil, Trash2, X } from "lucide-react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import { PressableScale } from "@/components/shared/pressable-scale";
@@ -14,6 +14,13 @@ import {
   useRenameCategory,
 } from "@/features/subscriptions/hooks/use-category-mutations";
 import { useCategories } from "@/features/subscriptions/hooks/use-categories";
+import { selectionChange } from "@/lib/haptics";
+
+const DEFAULT_CATEGORY_EMOJI = "📦";
+
+function normalizeEmoji(value: string): string {
+  return value.trim() || DEFAULT_CATEGORY_EMOJI;
+}
 
 export function CategoriesScreen() {
   const { theme } = useUnistyles();
@@ -21,28 +28,46 @@ export function CategoriesScreen() {
   const createCategory = useCreateCategory();
   const renameCategory = useRenameCategory();
   const archiveCategory = useArchiveCategory();
+  const [emoji, setEmoji] = useState(DEFAULT_CATEGORY_EMOJI);
   const [name, setName] = useState("");
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [editingEmoji, setEditingEmoji] = useState(DEFAULT_CATEGORY_EMOJI);
   const [editingName, setEditingName] = useState("");
 
   const handleCreate = useCallback(() => {
     const trimmed = name.trim();
     if (!trimmed) return;
-    createCategory.mutate(trimmed, { onSuccess: () => setName("") });
-  }, [createCategory, name]);
+    createCategory.mutate(
+      { emoji: normalizeEmoji(emoji), name: trimmed },
+      {
+        onSuccess: () => {
+          setEmoji(DEFAULT_CATEGORY_EMOJI);
+          setName("");
+        },
+      },
+    );
+  }, [createCategory, emoji, name]);
 
   const handleRename = useCallback(() => {
     if (!editingId || !editingName.trim()) return;
     renameCategory.mutate(
-      { id: editingId, name: editingName.trim() },
+      { id: editingId, emoji: normalizeEmoji(editingEmoji), name: editingName.trim() },
       {
         onSuccess: () => {
           setEditingId(null);
+          setEditingEmoji(DEFAULT_CATEGORY_EMOJI);
           setEditingName("");
         },
       },
     );
-  }, [editingId, editingName, renameCategory]);
+  }, [editingEmoji, editingId, editingName, renameCategory]);
+
+  const cancelEdit = useCallback(() => {
+    selectionChange();
+    setEditingId(null);
+    setEditingEmoji(DEFAULT_CATEGORY_EMOJI);
+    setEditingName("");
+  }, []);
 
   const confirmArchive = useCallback(
     (id: string, categoryName: string) => {
@@ -63,7 +88,18 @@ export function CategoriesScreen() {
       <Stack.Screen options={{ title: "Categories" }} />
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>New category</Text>
-        <View style={styles.card}>
+        <View style={styles.createCard}>
+          <TextInput
+            autoCapitalize="none"
+            autoCorrect={false}
+            maxLength={4}
+            onChangeText={setEmoji}
+            placeholder={DEFAULT_CATEGORY_EMOJI}
+            placeholderTextColor={theme.colors.placeholder}
+            returnKeyType="next"
+            style={styles.emojiInput}
+            value={emoji}
+          />
           <TextInput
             autoCapitalize="words"
             autoCorrect={false}
@@ -91,6 +127,17 @@ export function CategoriesScreen() {
                 {editing ? (
                   <>
                     <TextInput
+                      autoCapitalize="none"
+                      autoCorrect={false}
+                      maxLength={4}
+                      onChangeText={setEditingEmoji}
+                      placeholder={DEFAULT_CATEGORY_EMOJI}
+                      placeholderTextColor={theme.colors.placeholder}
+                      returnKeyType="next"
+                      style={styles.editEmojiInput}
+                      value={editingEmoji}
+                    />
+                    <TextInput
                       autoCapitalize="words"
                       autoCorrect={false}
                       onChangeText={setEditingName}
@@ -101,20 +148,43 @@ export function CategoriesScreen() {
                       style={styles.rowInput}
                       value={editingName}
                     />
-                    <PressableScale onPress={handleRename} style={styles.smallAction}>
-                      <Text style={styles.smallActionText}>Save</Text>
+                    <PressableScale hitSlop={8} onPress={cancelEdit} scaleTo={0.9}>
+                      <X color={theme.colors.muted} size={17} strokeWidth={2} />
+                    </PressableScale>
+                    <PressableScale onPress={handleRename} style={styles.iconAction}>
+                      <Check color={theme.colors.primaryForeground} size={16} strokeWidth={2.5} />
                     </PressableScale>
                   </>
                 ) : (
                   <>
                     <PressableScale
                       onPress={() => {
+                        selectionChange();
                         setEditingId(category.id);
+                        setEditingEmoji(category.emoji);
                         setEditingName(category.name);
                       }}
                       style={styles.rowMain}
                     >
-                      <Text style={styles.rowLabel}>{category.name}</Text>
+                      <View style={styles.categoryIcon}>
+                        <Text style={styles.categoryEmoji}>{category.emoji}</Text>
+                      </View>
+                      <View style={styles.rowCopy}>
+                        <Text style={styles.rowLabel}>{category.name}</Text>
+                        <Text style={styles.rowHint}>Shown on subscription forms and lists</Text>
+                      </View>
+                    </PressableScale>
+                    <PressableScale
+                      hitSlop={8}
+                      onPress={() => {
+                        selectionChange();
+                        setEditingId(category.id);
+                        setEditingEmoji(category.emoji);
+                        setEditingName(category.name);
+                      }}
+                      scaleTo={0.9}
+                    >
+                      <Pencil color={theme.colors.iconMuted} size={16} strokeWidth={2} />
                     </PressableScale>
                     <PressableScale
                       hitSlop={8}
@@ -151,7 +221,7 @@ const styles = StyleSheet.create((theme) => ({
     textTransform: "uppercase",
     letterSpacing: 1.6,
   },
-  card: {
+  createCard: {
     flexDirection: "row",
     alignItems: "center",
     gap: 12,
@@ -174,6 +244,17 @@ const styles = StyleSheet.create((theme) => ({
     fontSize: 14,
     color: theme.colors.text,
     padding: 0,
+  },
+  emojiInput: {
+    width: 44,
+    height: 44,
+    borderRadius: 999,
+    backgroundColor: theme.colors.surface,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    textAlign: "center",
+    fontSize: 20,
+    color: theme.colors.text,
   },
   action: {
     paddingHorizontal: 12,
@@ -200,10 +281,45 @@ const styles = StyleSheet.create((theme) => ({
   },
   rowMain: {
     flex: 1,
+    minWidth: 0,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+  },
+  categoryIcon: {
+    width: 38,
+    height: 38,
+    borderRadius: 999,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: theme.name === "dark" ? "#1E2A5F" : "#EEF2FF",
+  },
+  categoryEmoji: {
+    fontSize: 18,
+  },
+  rowCopy: {
+    flex: 1,
+    minWidth: 0,
   },
   rowLabel: {
     fontSize: 14,
     fontWeight: "500",
+    color: theme.colors.text,
+  },
+  rowHint: {
+    fontSize: 12,
+    color: theme.colors.muted,
+    marginTop: 2,
+  },
+  editEmojiInput: {
+    width: 38,
+    height: 38,
+    borderRadius: 999,
+    backgroundColor: theme.colors.surface,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    textAlign: "center",
+    fontSize: 18,
     color: theme.colors.text,
   },
   rowInput: {
@@ -212,15 +328,12 @@ const styles = StyleSheet.create((theme) => ({
     color: theme.colors.text,
     padding: 0,
   },
-  smallAction: {
-    paddingHorizontal: 10,
-    paddingVertical: 6,
+  iconAction: {
+    width: 32,
+    height: 32,
     borderRadius: 999,
-    backgroundColor: theme.colors.surface,
-  },
-  smallActionText: {
-    fontSize: 12,
-    fontWeight: "700",
-    color: theme.colors.primary,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: theme.colors.primary,
   },
 }));
