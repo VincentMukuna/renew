@@ -4,7 +4,7 @@ import { Pressable, ScrollView, Text, View } from "react-native";
 
 import { router } from "expo-router";
 
-import { CalendarDays, ChevronLeft, ChevronRight, Plus } from "lucide-react-native";
+import { CalendarDays, ChevronLeft, ChevronRight } from "lucide-react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import { TabScreen, useTabScrollPadding } from "@/components/navigation/tab-screen";
@@ -111,17 +111,12 @@ export function CalendarScreen() {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.header}>
-          <View style={styles.headerCopy}>
-            <Text style={styles.title}>Calendar</Text>
-            <Text style={styles.subtitle}>See what renews and when.</Text>
-          </View>
-          <PressableScale
-            accessibilityLabel="Add subscription"
-            onPress={openAdd}
-            style={styles.addButton}
-          >
-            <Plus color={theme.colors.icon} size={18} strokeWidth={1.7} />
-          </PressableScale>
+          <Text style={styles.title}>Calendar</Text>
+          {hasActiveSubscriptions ? (
+            <Pressable hitSlop={10} onPress={selectToday}>
+              <Text style={styles.todayAction}>Today</Text>
+            </Pressable>
+          ) : null}
         </View>
 
         {hasActiveSubscriptions ? (
@@ -132,31 +127,16 @@ export function CalendarScreen() {
                 onPress={() => moveMonth(-1)}
                 style={styles.monthButton}
               >
-                <ChevronLeft color={theme.colors.icon} size={18} strokeWidth={1.8} />
+                <ChevronLeft color={theme.colors.icon} size={20} strokeWidth={1.8} />
               </PressableScale>
-              <View style={styles.monthLabelWrap}>
-                <Text style={styles.monthLabel}>{formatMonthLabel(visibleMonth)}</Text>
-                <Pressable hitSlop={8} onPress={selectToday}>
-                  <Text style={styles.todayAction}>Today</Text>
-                </Pressable>
-              </View>
+              <Text style={styles.monthLabel}>{formatMonthLabel(visibleMonth)}</Text>
               <PressableScale
                 accessibilityLabel="Next month"
                 onPress={() => moveMonth(1)}
                 style={styles.monthButton}
               >
-                <ChevronRight color={theme.colors.icon} size={18} strokeWidth={1.8} />
+                <ChevronRight color={theme.colors.icon} size={20} strokeWidth={1.8} />
               </PressableScale>
-            </View>
-
-            <View style={styles.monthSummary}>
-              <Text style={styles.monthAmount}>
-                {formatCurrency(monthSummary.totalAmount)} renewing this month
-              </Text>
-              <Text style={styles.monthMeta}>
-                Across {monthSummary.activeSubscriptionCount} active{" "}
-                {monthSummary.activeSubscriptionCount === 1 ? "subscription" : "subscriptions"}
-              </Text>
             </View>
 
             <View style={styles.calendar}>
@@ -271,80 +251,44 @@ export function CalendarScreen() {
 const styles = StyleSheet.create((theme) => ({
   scroll: {
     paddingHorizontal: 20,
-    paddingTop: 16,
-    gap: 20,
+    paddingTop: 14,
+    gap: 16,
   },
   header: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    gap: 16,
-  },
-  headerCopy: {
-    flex: 1,
-    minWidth: 0,
+    gap: 12,
   },
   title: {
-    fontSize: 28,
+    fontSize: 26,
     fontWeight: "700",
     color: theme.colors.text,
   },
-  subtitle: {
+  todayAction: {
     fontSize: 13,
-    lineHeight: 19,
-    color: theme.colors.muted,
-    marginTop: 3,
-  },
-  addButton: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: theme.colors.surface,
+    fontWeight: "700",
+    color: theme.colors.primary,
   },
   monthNav: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    gap: 12,
+    gap: 16,
   },
   monthButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: theme.colors.surface,
-  },
-  monthLabelWrap: {
-    flex: 1,
-    alignItems: "center",
-    gap: 3,
   },
   monthLabel: {
+    flex: 1,
+    textAlign: "center",
     fontSize: 17,
     fontWeight: "700",
     color: theme.colors.text,
-  },
-  todayAction: {
-    fontSize: 12,
-    fontWeight: "700",
-    color: theme.colors.primary,
-  },
-  monthSummary: {
-    paddingVertical: 4,
-    gap: 3,
-  },
-  monthAmount: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: theme.colors.text,
-    fontVariant: ["tabular-nums"],
-  },
-  monthMeta: {
-    fontSize: 13,
-    color: theme.colors.muted,
   },
   calendar: {
     gap: 10,
