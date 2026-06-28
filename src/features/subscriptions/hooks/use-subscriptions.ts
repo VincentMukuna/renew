@@ -15,6 +15,10 @@ export async function loadSubscriptions() {
   return summaries.map((subscription) => toSubscriptionListItemView(subscription, now));
 }
 
+export async function loadSubscriptionSummaries() {
+  return subscriptionRepository.listSummaries();
+}
+
 export async function loadSubscriptionStats() {
   const now = new Date();
   const summaries = await subscriptionRepository.listSummaries();
@@ -26,6 +30,14 @@ export function useSubscriptions() {
   return useQuery({
     queryKey: subscriptionKeys.all,
     queryFn: loadSubscriptions,
+    staleTime: Number.POSITIVE_INFINITY,
+  });
+}
+
+export function useSubscriptionSummaries() {
+  return useQuery({
+    queryKey: subscriptionKeys.summaries,
+    queryFn: loadSubscriptionSummaries,
     staleTime: Number.POSITIVE_INFINITY,
   });
 }

@@ -45,6 +45,16 @@ export default function TabsLayout() {
       </NativeTabs.Trigger>
       <NativeTabs.Trigger
         contentStyle={{ backgroundColor: theme.colors.background }}
+        name="calendar"
+      >
+        <NativeTabs.Trigger.Label>Calendar</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Icon
+          md={{ default: "calendar_month", selected: "calendar_month" }}
+          sf={{ default: "calendar", selected: "calendar" }}
+        />
+      </NativeTabs.Trigger>
+      <NativeTabs.Trigger
+        contentStyle={{ backgroundColor: theme.colors.background }}
         name="settings"
       >
         <NativeTabs.Trigger.Label>Settings</NativeTabs.Trigger.Label>

@@ -102,6 +102,27 @@ export function getNextRenewalDate(
   return next;
 }
 
+export function getRenewalDatesBetween(
+  startDate: Date,
+  recurrence: Recurrence,
+  rangeStart: Date,
+  rangeEnd: Date,
+): Date[] {
+  const renewals: Date[] = [];
+  let next = new Date(startDate);
+
+  while (next < rangeStart) {
+    next = addRecurrence(next, recurrence);
+  }
+
+  while (next <= rangeEnd) {
+    renewals.push(new Date(next));
+    next = addRecurrence(next, recurrence);
+  }
+
+  return renewals;
+}
+
 export function getCompletedBillingCycles(
   startDate: Date,
   recurrence: Recurrence,

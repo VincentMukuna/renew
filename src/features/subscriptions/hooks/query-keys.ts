@@ -4,6 +4,7 @@ export const categoryKeys = {
 
 export const subscriptionKeys = {
   all: ["subscriptions"] as const,
+  summaries: ["subscriptions", "summaries"] as const,
   stats: ["subscriptions", "stats"] as const,
   detail: (id: string) => ["subscriptions", id] as const,
 };
