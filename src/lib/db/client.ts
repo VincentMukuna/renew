@@ -1,0 +1,25 @@
+import { type SQLiteDatabase, openDatabaseAsync } from "expo-sqlite";
+
+import { runMigrations } from "./migrations";
+
+const DB_NAME = "renew.db";
+
+let dbPromise: Promise<SQLiteDatabase> | null = null;
+
+async function initDb(): Promise<SQLiteDatabase> {
+  const db = await openDatabaseAsync(DB_NAME);
+  await db.execAsync("PRAGMA foreign_keys = ON");
+  await runMigrations(db);
+  return db;
+}
+
+export function getDb(): Promise<SQLiteDatabase> {
+  if (!dbPromise) {
+    dbPromise = initDb().catch((error) => {
+      dbPromise = null;
+      throw error;
+    });
+  }
+
+  return dbPromise;
+}
