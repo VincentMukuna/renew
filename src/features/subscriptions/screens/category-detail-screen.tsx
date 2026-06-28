@@ -207,7 +207,7 @@ function CategoryDetailContent({
           style={[styles.footer, { paddingBottom: insets.bottom + 20 }]}
         >
           <PressableScale onPress={openAddSubscription} style={styles.primaryBtn}>
-            <Text style={styles.primaryBtnText}>Add subscription for {category.name}</Text>
+            <Text style={styles.primaryBtnText}>Add Subscription for {category.name}</Text>
           </PressableScale>
         </LinearGradient>
       </View>
