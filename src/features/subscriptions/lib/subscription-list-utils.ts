@@ -2,6 +2,15 @@ import type { SubscriptionListItemView } from "@/features/subscriptions/view-mod
 
 export type SubscriptionFilterKey = "all" | "active" | "inactive" | "due-soon";
 
+export function sortByRenewalDate(
+  subscriptions: SubscriptionListItemView[],
+): SubscriptionListItemView[] {
+  return [...subscriptions].sort((a, b) => {
+    if (a.isActive !== b.isActive) return a.isActive ? -1 : 1;
+    return a.nextRenewalDate.localeCompare(b.nextRenewalDate);
+  });
+}
+
 export function filterSubscriptions(
   subscriptions: SubscriptionListItemView[],
   filter: SubscriptionFilterKey,
@@ -27,10 +36,7 @@ export function filterSubscriptions(
     result.push(subscription);
   }
 
-  return result.sort((a, b) => {
-    if (a.isActive !== b.isActive) return a.isActive ? -1 : 1;
-    return a.nextRenewalDate.localeCompare(b.nextRenewalDate);
-  });
+  return sortByRenewalDate(result);
 }
 
 export function computeSubscriptionCounts(subscriptions: SubscriptionListItemView[]) {

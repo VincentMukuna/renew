@@ -15,6 +15,7 @@ import {
   useSubscriptions,
   useSubscriptionStats,
 } from "@/features/subscriptions/hooks/use-subscriptions";
+import { sortByRenewalDate } from "@/features/subscriptions/lib/subscription-list-utils";
 import type { SubscriptionListItemView } from "@/features/subscriptions/view-models";
 import { formatCurrency } from "@/lib/utils/formatters";
 
@@ -26,7 +27,11 @@ export function HomeScreen() {
   const { data: stats } = useSubscriptionStats();
 
   const dueSoon = useMemo(
-    () => subscriptions.filter((subscription) => subscription.isDueSoon).slice(0, HOME_SECTION_LIMIT),
+    () =>
+      sortByRenewalDate(subscriptions.filter((subscription) => subscription.isDueSoon)).slice(
+        0,
+        HOME_SECTION_LIMIT,
+      ),
     [subscriptions],
   );
   const active = useMemo(
