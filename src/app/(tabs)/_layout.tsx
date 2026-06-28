@@ -49,8 +49,8 @@ export default function TabsLayout() {
       >
         <NativeTabs.Trigger.Label>Calendar</NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon
-          md={{ default: "calendar_month", selected: "calendar_month" }}
-          sf={{ default: "calendar", selected: "calendar" }}
+          md={{ default: "event_repeat", selected: "event_repeat" }}
+          sf={{ default: "calendar.badge.clock", selected: "calendar.badge.clock" }}
         />
       </NativeTabs.Trigger>
       <NativeTabs.Trigger
